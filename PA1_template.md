@@ -1,14 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
-```{r load_data, echo=TRUE, results='hide'}
+
+```r
 # Defining a custom date time class and conversion functions
 as.POSIXct.D<-function(from){as.POSIXct(from,format="%Y-%m-%e")}
 as.Character.DC<-function(from,value){format(value,format = "%Y-%m-%e")}
@@ -30,7 +26,8 @@ integer.interval<-as.integer(levels(factor.interval))
 
 ## What is mean total number of steps taken per day?
 
-```{r total_steps_per_day, echo=TRUE}
+
+```r
 # Computing total steps per day
 data.date.totalperday<-tapply(data[[1]],factor.date,sum)
 data.date.totalperday <- data.frame(cbind(Date=posixct.date,Total=data.date.totalperday))
@@ -38,23 +35,38 @@ data.date.totalperday <- data.frame(cbind(Date=posixct.date,Total=data.date.tota
 library(ggplot2)
 plot.total.step<-ggplot(data.date.totalperday, aes(Total))
 plot.total.step + geom_histogram()
+```
+
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![](PA1_template_files/figure-html/total_steps_per_day-1.png) 
+
+```r
 # Computing the median and the mean of total steps per day
 median.steps.perday<-median(data.date.totalperday[[2]],na.rm = TRUE)
 mean.steps.perday<-mean(data.date.totalperday[[2]],na.rm = TRUE)
 ```
 
-The median of total steps per day is: `r format(median.steps.perday)`  
-The mean of total steps per day is: `r format(mean.steps.perday)`  
+The median of total steps per day is: 10765  
+The mean of total steps per day is: 10766.19  
 
 ## What is the average daily activity pattern?
 
-```{r avarage_daily_activity, echo=TRUE}
+
+```r
 # Computing mean steps per interval
 data.interval.avarage<-tapply(data[[1]],factor.interval,mean,na.rm=TRUE)
 # Generating plot variable of average per interval
 plot.interval.average<-ggplot(data.frame(cbind(interval=integer.interval,average=data.interval.avarage)),aes(interval,average))
 # Showing a scatter plot
 plot.interval.average + geom_line()
+```
+
+![](PA1_template_files/figure-html/avarage_daily_activity-1.png) 
+
+```r
 # Converting a array to a vector
 data.interval.avarage<-c(data.interval.avarage)
 # Getting the index of maximum average of steps
@@ -63,11 +75,12 @@ max.interval.index<-which(data.interval.avarage>=max(data.interval.avarage))
 max.interval.value<-integer.interval[max.interval.index]
 ```
 
-The interval with the maximun number of steps is: `r format(max.interval.value)`  
+The interval with the maximun number of steps is: 835  
 
 ## Imputing missing values
 
-```{r imputting_missing_values, echo=TRUE, results='hide'}
+
+```r
 # Getting indexes of missing values
 na.index<-which(is.na(data$steps))
 # Imputting the mean of the intervals as replacement of NAs
@@ -79,20 +92,30 @@ data.imputing.na.totalperday <- data.frame(cbind(Date=posixct.date,Total=data.im
 # Ploting the total steps per day frequency
 plot.imputing.na.total.step<-ggplot(data.imputing.na.totalperday, aes(Total))
 plot.imputing.na.total.step + geom_histogram()
+```
+
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![](PA1_template_files/figure-html/imputting_missing_values-1.png) 
+
+```r
 # Computing the median and the mean of total steps per day
 median.steps.perday.imputing.na<-median(data.imputing.na.totalperday[[2]],na.rm = TRUE)
 mean.steps.perday.imputing.na<-mean(data.imputing.na.totalperday[[2]],na.rm = TRUE)
 ```
 
-There are `r length(na.index)` NAs in the data set.  
-The median of total steps per day using the imputted data is: `r format(median.steps.perday.imputing.na)`  
-The mean of total steps per day using the imputted data is: `r format(mean.steps.perday.imputing.na)`  
+There are 2304 NAs in the data set.  
+The median of total steps per day using the imputted data is: 10641  
+The mean of total steps per day using the imputted data is: 10749.77  
 
-Data used to replace the missing values in the data set, has decreased the median and the mean of the data `r format((1-(median.steps.perday.imputing.na/median.steps.perday))*100)`% and `r format((1-(mean.steps.perday.imputing.na/mean.steps.perday))*100)`% respectivally. So, the impact in the total number of steps per day is low.
+Data used to replace the missing values in the data set, has decreased the median and the mean of the data 1.151881% and 0.1524977% respectivally. So, the impact in the total number of steps per day is low.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r weekday_weekend_diferences, echo=TRUE}
+
+```r
 # Creating a data frame without missing values
 data.imputing.na.week<-data.imputing.na
 # Adding a new column with the name of the day for that observation
@@ -118,6 +141,7 @@ data.imputing.na.interval.avarage$week<-factor(data.imputing.na.interval.avarage
 plot.interval.average.week<-ggplot(data.imputing.na.interval.avarage,aes(interval,mean))
 # Showing a scatter plot
 plot.interval.average.week + geom_line() + facet_grid(. ~ week)
-
 ```
+
+![](PA1_template_files/figure-html/weekday_weekend_diferences-1.png) 
 
